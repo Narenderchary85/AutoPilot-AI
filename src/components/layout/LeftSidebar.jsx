@@ -28,7 +28,7 @@ const LeftSidebar = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full p-6 gap-8 bg-gradient-to-b from-white to-slate-50 border-r border-slate-200">
+    <div className="flex flex-col w-full p-6 gap-8 bg-gradient-to-b from-white to-slate-50 border-r border-slate-200">
       {/* Header with Logo and User */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}

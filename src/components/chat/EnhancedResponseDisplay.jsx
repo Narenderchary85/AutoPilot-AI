@@ -1,6 +1,6 @@
 // components/emails/EmailDisplay.jsx
 import { motion } from 'framer-motion';
-import { FiMail, FiUser, FiCalendar, FiTag, FiExternalLink, FiChevronRight, FiBookmark, FiArchive } from 'react-icons/fi';
+import { FiMail, FiUser, FiCalendar, FiTag, FiExternalLink, FiChevronRight, FiBookmark, FiArchive, FiCpu } from 'react-icons/fi';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
 
 const EmailDisplay = ({ emailData }) => {
