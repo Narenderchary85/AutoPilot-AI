@@ -77,6 +77,57 @@ const MessageBubble = ({ message, index }) => {
     return agent.charAt(0).toUpperCase() + agent.slice(1) + ' Agent';
   };
 
+  function extractReadableText(response) {
+    console.log("RAW RESPONSE:", response);
+  
+    let text = "";
+  
+    // 1️⃣ If response is a string
+    if (typeof response === "string") {
+      text = response;
+    }
+  
+    // 2️⃣ If response is an object
+    else if (typeof response === "object" && response !== null) {
+      if (typeof response.message === "string") {
+        text = response.message;
+      } else if (typeof response.emails === "string") {
+        text = response.emails;
+      } else if (typeof response.text === "string") {
+        text = response.text;
+      } else {
+        // Last resort: stringify object
+        text = JSON.stringify(response);
+      }
+    }
+  
+    // 3️⃣ CLEAN THE TEXT (MOST IMPORTANT PART)
+    return cleanReadableText(text);
+  }
+
+  function cleanReadableText(text) {
+    if (!text) return "";
+  
+    return text
+      // Remove JSON braces
+      .replace(/^{|}$/g, "")
+      // Remove quotes around entire string
+      .replace(/^"+|"+$/g, "")
+      // Remove escaped newlines
+      .replace(/\\n/g, "\n")
+      // Remove escaped quotes
+      .replace(/\\"/g, '"')
+      // Remove excessive colons used in JSON
+      .replace(/"\s*:\s*"/g, " ")
+      // Collapse multiple spaces
+      .replace(/\s{2,}/g, " ")
+      // Fix multiple newlines
+      .replace(/\n{3,}/g, "\n\n")
+      // Trim
+      .trim();
+  }
+  
+
   return (
     <motion.div
       variants={containerVariants}
@@ -158,13 +209,9 @@ const MessageBubble = ({ message, index }) => {
             <div className="relative z-10 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm leading-relaxed whitespace-pre-line">
-                {!isUser && message.meta?.details ? (
-  <EnhancedResponseDisplay reply={message.meta.details} />
-) : (
-  <p className="text-sm leading-relaxed whitespace-pre-line">
-    {message.text}
-  </p>
-)}
+                <p className="text-sm leading-relaxed whitespace-pre-line">
+                {extractReadableText(message)}
+                </p>
                 </div>
                 
                 {/* Action buttons */}
