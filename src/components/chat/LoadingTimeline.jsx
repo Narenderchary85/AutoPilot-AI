@@ -291,7 +291,6 @@ const LoadingTimeline = () => {
           </div>
         </div>
 
-        {/* Footer with agent status */}
         <div className="relative z-10 border-t border-slate-100 bg-slate-50/50 p-4">
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-4">
