@@ -1,15 +1,12 @@
-// components/chat/MessageBubble.jsx
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCpu, FiUser, FiCheckCircle, FiAlertCircle, FiClock, FiCopy, FiChevronDown, FiExternalLink } from 'react-icons/fi';
-import EnhancedResponseDisplay from '../chat/EnhancedResponseDisplay';
 
 const MessageBubble = ({ message, index }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
 
-  // Animation variants
   const containerVariants = {
     hidden: { 
       opacity: 0, 
@@ -81,13 +78,11 @@ const MessageBubble = ({ message, index }) => {
     console.log("RAW RESPONSE:", response);
   
     let text = "";
-  
-    // 1️⃣ If response is a string
+
     if (typeof response === "string") {
       text = response;
     }
-  
-    // 2️⃣ If response is an object
+
     else if (typeof response === "object" && response !== null) {
       if (typeof response.message === "string") {
         text = response.message;
@@ -96,12 +91,10 @@ const MessageBubble = ({ message, index }) => {
       } else if (typeof response.text === "string") {
         text = response.text;
       } else {
-        // Last resort: stringify object
         text = JSON.stringify(response);
       }
     }
   
-    // 3️⃣ CLEAN THE TEXT (MOST IMPORTANT PART)
     return cleanReadableText(text);
   }
 
@@ -109,21 +102,13 @@ const MessageBubble = ({ message, index }) => {
     if (!text) return "";
   
     return text
-      // Remove JSON braces
       .replace(/^{|}$/g, "")
-      // Remove quotes around entire string
       .replace(/^"+|"+$/g, "")
-      // Remove escaped newlines
       .replace(/\\n/g, "\n")
-      // Remove escaped quotes
       .replace(/\\"/g, '"')
-      // Remove excessive colons used in JSON
       .replace(/"\s*:\s*"/g, " ")
-      // Collapse multiple spaces
       .replace(/\s{2,}/g, " ")
-      // Fix multiple newlines
       .replace(/\n{3,}/g, "\n\n")
-      // Trim
       .trim();
   }
   
@@ -136,7 +121,6 @@ const MessageBubble = ({ message, index }) => {
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 group`}
     >
       <div className={`flex max-w-2xl gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
-        {/* Avatar with animation */}
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -154,8 +138,7 @@ const MessageBubble = ({ message, index }) => {
               <FiCpu className="text-white text-sm" />
             </motion.div>
           )}
-          
-          {/* Online indicator for agent */}
+
           {!isUser && (
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
@@ -165,9 +148,8 @@ const MessageBubble = ({ message, index }) => {
           )}
         </motion.div>
 
-        {/* Message bubble */}
         <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-[85%]`}>
-          {/* Agent label for AI messages */}
+
           {!isUser && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
@@ -186,7 +168,6 @@ const MessageBubble = ({ message, index }) => {
             </motion.div>
           )}
 
-          {/* Bubble container */}
           <motion.div
             variants={bubbleVariants}
             className={`relative rounded-2xl shadow-sm overflow-hidden
@@ -195,7 +176,6 @@ const MessageBubble = ({ message, index }) => {
                           : 'bg-gradient-to-br from-white to-slate-50 border border-slate-200'
                         }`}
           >
-            {/* Animated background for AI messages */}
             {!isUser && (
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
@@ -205,7 +185,6 @@ const MessageBubble = ({ message, index }) => {
               />
             )}
 
-            {/* Message content */}
             <div className="relative z-10 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="text-sm leading-relaxed whitespace-pre-line">
@@ -214,7 +193,6 @@ const MessageBubble = ({ message, index }) => {
                 </p>
                 </div>
                 
-                {/* Action buttons */}
                 <div className={`flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200
                                 ${isUser ? 'flex-row' : 'flex-row-reverse'}`}>
                   <motion.button
@@ -232,7 +210,6 @@ const MessageBubble = ({ message, index }) => {
                 </div>
               </div>
 
-              {/* Status details if available */}
               {message.meta?.details && (
                 <>
                   <motion.button
@@ -318,8 +295,6 @@ const MessageBubble = ({ message, index }) => {
               )}
             </div>
           </motion.div>
-
-          {/* Footer with timestamp and copy feedback */}
           <div className="flex items-center gap-3 mt-1 ml-1">
             <span className="text-[10px] text-slate-400 font-medium">
               {formatTimestamp()}
@@ -342,7 +317,6 @@ const MessageBubble = ({ message, index }) => {
         </div>
       </div>
 
-      {/* Decorative elements for AI messages */}
       {!isUser && (
         <div className="absolute left-1/4 -translate-x-1/2 -z-10">
           <motion.div

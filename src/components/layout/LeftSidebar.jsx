@@ -1,4 +1,3 @@
-// components/layout/LeftSidebar.jsx
 import { useState } from 'react';
 import { FiMail, FiCalendar, FiGlobe, FiTrendingUp, FiZap, FiActivity, FiUser, FiSettings } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,13 +22,11 @@ const LeftSidebar = () => {
 
   const handleActionClick = (actionId) => {
     setActiveAgent(actionId);
-    // Simulate agent activation
     setTimeout(() => setActiveAgent(null), 2000);
   };
 
   return (
     <div className="flex flex-col w-full p-6 gap-8 bg-gradient-to-b from-white to-slate-50 border-r border-slate-200">
-      {/* Header with Logo and User */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -79,7 +76,6 @@ const LeftSidebar = () => {
         </motion.button>
       </motion.div>
 
-      {/* Stats Overview */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -129,7 +125,6 @@ const LeftSidebar = () => {
         </div>
       </motion.div>
 
-      {/* Quick Actions */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -170,7 +165,6 @@ const LeftSidebar = () => {
                             : 'bg-white text-slate-700 hover:bg-[#f3f4ff] border border-slate-200 hover:border-[#6264a7]/30'
                           }`}
               >
-                {/* Animated background */}
                 {isActive && (
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"
@@ -223,7 +217,6 @@ const LeftSidebar = () => {
         </div>
       </motion.div>
 
-      {/* Agent Status */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -285,7 +278,6 @@ const LeftSidebar = () => {
         </div>
       </motion.div>
 
-      {/* User Profile */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

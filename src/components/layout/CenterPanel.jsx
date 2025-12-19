@@ -1,4 +1,3 @@
-// components/layout/CenterPanel.jsx
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,11 +41,10 @@ const CenterPanel = () => {
         meta: { status, details },
       };
 
-      // Add typing animation effect
       setTimeout(() => {
         setMessages((prev) => [...prev, agentMsg]);
         setLoading(false);
-      }, 800); // Simulate agent "thinking"
+      }, 800); 
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -69,7 +67,6 @@ const CenterPanel = () => {
   return (
     <div className="flex-1 flex flex-col items-center bg-gradient-to-b from-slate-50 to-white">
       <div className="w-full max-w-3xl flex-1 flex flex-col px-4 py-6 gap-4">
-        {/* Hero Section with Enhanced Animations */}
         <AnimatePresence>
           {messages.length === 0 && !loading && (
             <motion.div
@@ -78,7 +75,6 @@ const CenterPanel = () => {
               transition={{ duration: 0.5 }}
               className="text-center mb-8"
             >
-              {/* Animated Header */}
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -97,7 +93,6 @@ const CenterPanel = () => {
                 </span>
               </motion.div>
 
-              {/* Main Title with Gradient */}
               <motion.h1
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -117,7 +112,6 @@ const CenterPanel = () => {
                 Autopilot intelligently routes requests to specialized sub‑agents in real‑time.
               </motion.p>
 
-              {/* Animated Stats */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -138,7 +132,6 @@ const CenterPanel = () => {
                 </div>
               </motion.div>
 
-              {/* Suggestions with Hover Effects */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -173,7 +166,6 @@ const CenterPanel = () => {
           )}
         </AnimatePresence>
 
-        {/* Messages Container */}
         <div className="flex-1 overflow-y-auto space-y-4 pb-4">
           <AnimatePresence mode="wait">
             {messages.map((msg, idx) => (
@@ -192,7 +184,6 @@ const CenterPanel = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Enhanced Input Composer */}
         <motion.form
           onSubmit={handleSubmit}
           initial={{ opacity: 0, y: 20 }}
@@ -205,7 +196,7 @@ const CenterPanel = () => {
             className="relative bg-white border border-slate-200 rounded-2xl
                       shadow-lg flex items-center gap-2 px-4 py-3"
           >
-            {/* Attachment Button */}
+
             <motion.button
               type="button"
               whileHover={{ scale: 1.1, rotate: 5 }}
@@ -217,7 +208,6 @@ const CenterPanel = () => {
               <FiPaperclip size={18} />
             </motion.button>
 
-            {/* Input Field */}
             <motion.div
               className="flex-1"
               whileFocus={{ scale: 1.01 }}
@@ -238,9 +228,7 @@ const CenterPanel = () => {
                 }}
               />
             </motion.div>
-
-            {/* Send Button */}
-            <motion.button
+             <motion.button
               type="submit"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(98, 100, 167, 0.4)" }}
               whileTap={{ scale: 0.95 }}
@@ -268,7 +256,6 @@ const CenterPanel = () => {
             </motion.button>
           </motion.div>
 
-          {/* Status Indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -288,7 +275,6 @@ const CenterPanel = () => {
         </motion.form>
       </div>
 
-      {/* Decorative Background Elements */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ 

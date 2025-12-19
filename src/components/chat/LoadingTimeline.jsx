@@ -47,7 +47,6 @@ const LoadingTimeline = () => {
     }
   ];
 
-  // Simulate step progression
   useEffect(() => {
     if (currentStep >= steps.length) {
       setStatusText('Finalizing response...');
@@ -66,7 +65,6 @@ const LoadingTimeline = () => {
     return () => clearTimeout(timer);
   }, [currentStep]);
 
-  // Reset simulation for demo purposes
   const resetSimulation = () => {
     setCurrentStep(0);
     setCompletedSteps([]);
@@ -81,9 +79,7 @@ const LoadingTimeline = () => {
       transition={{ duration: 0.3 }}
       className="max-w-2xl mx-auto mt-4"
     >
-      {/* Loading Container */}
       <div className="relative rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 shadow-lg overflow-hidden">
-        {/* Animated background */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
             animate={{ 
@@ -100,7 +96,6 @@ const LoadingTimeline = () => {
           />
         </div>
 
-        {/* Header */}
         <div className="relative z-10 p-5 border-b border-slate-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -134,7 +129,6 @@ const LoadingTimeline = () => {
             </motion.button>
           </div>
 
-          {/* Progress bar */}
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs mb-1.5">
               <span className="text-slate-700">Overall Progress</span>
@@ -164,7 +158,6 @@ const LoadingTimeline = () => {
           </div>
         </div>
 
-        {/* Timeline Steps */}
         <div className="relative z-10 p-5">
           <div className="space-y-4">
             {steps.map((step, idx) => {
@@ -182,7 +175,6 @@ const LoadingTimeline = () => {
                   whileHover={{ scale: 1.01, x: 4 }}
                   className="relative"
                 >
-                  {/* Timeline connector */}
                   {idx < steps.length - 1 && (
                     <div className="absolute left-6 top-10 bottom-0 w-0.5 bg-slate-200 z-0">
                       <motion.div
@@ -195,7 +187,6 @@ const LoadingTimeline = () => {
                   )}
 
                   <div className="flex items-start gap-4">
-                    {/* Status indicator */}
                     <div className="relative z-10">
                       <motion.div
                         animate={isActive ? {
@@ -236,8 +227,7 @@ const LoadingTimeline = () => {
                             }
                           />
                         </motion.div>
-                        
-                        {/* Completion check */}
+
                         <AnimatePresence>
                           {isCompleted && (
                             <motion.div
@@ -253,7 +243,6 @@ const LoadingTimeline = () => {
                       </motion.div>
                     </div>
 
-                    {/* Step content */}
                     <div className="flex-1 pt-1">
                       <div className="flex items-center justify-between">
                         <h4 className={`text-sm font-semibold ${
@@ -283,8 +272,7 @@ const LoadingTimeline = () => {
                         </div>
                       </div>
                       <p className="text-xs text-slate-500 mt-1">{step.description}</p>
-                      
-                      {/* Mini progress for current step */}
+ 
                       {isActive && (
                         <motion.div
                           initial={{ width: 0 }}

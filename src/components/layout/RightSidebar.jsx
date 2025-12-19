@@ -1,4 +1,3 @@
-// components/layout/RightSidebar.jsx
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiClock, FiCheckCircle, FiAlertCircle, FiActivity, FiTrendingUp, FiFilter, FiRefreshCw } from 'react-icons/fi';
@@ -108,7 +107,6 @@ const RightSidebar = () => {
 
   return (
     <div className="flex flex-col w-full h-full p-6 gap-6 bg-gradient-to-b from-white to-slate-50 border-l border-slate-200">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -136,7 +134,6 @@ const RightSidebar = () => {
         </motion.button>
       </motion.div>
 
-      {/* Stats Overview */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -174,7 +171,6 @@ const RightSidebar = () => {
         })}
       </motion.div>
 
-      {/* Filter Tabs */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -217,7 +213,6 @@ const RightSidebar = () => {
         </div>
       </motion.div>
 
-      {/* Activity Timeline */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -253,17 +248,13 @@ const RightSidebar = () => {
                                 : 'border-slate-200 bg-white hover:border-[#6264a7]/30 hover:shadow-sm'
                               }`}
                   >
-                    {/* Timeline connector */}
                     {index < filteredHistory.length - 1 && (
                       <div className="absolute left-6 top-10 bottom-0 w-0.5 bg-slate-200 z-0" />
                     )}
-
-                    {/* Status indicator */}
                     <div className="absolute left-5 top-5 -translate-x-1/2 z-10">
                       <div className={`w-2 h-2 rounded-full ${statusColors[item.status]} ring-4 ring-white`} />
                     </div>
 
-                    {/* Content */}
                     <div className="p-4 pl-10">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
@@ -298,7 +289,6 @@ const RightSidebar = () => {
                         </div>
                       </div>
 
-                      {/* Expanded Details */}
                       <AnimatePresence>
                         {selectedItem === item.id && (
                           <motion.div
@@ -342,7 +332,6 @@ const RightSidebar = () => {
         </div>
       </motion.div>
 
-      {/* Summary Footer */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

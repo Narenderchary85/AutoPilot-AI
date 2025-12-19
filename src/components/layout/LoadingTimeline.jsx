@@ -1,4 +1,3 @@
-// components/chat/LoadingTimeline.jsx
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMail, FiCalendar, FiGlobe, FiCpu, FiZap, FiRefreshCw, FiCheck, FiActivity } from 'react-icons/fi';
@@ -331,7 +330,6 @@ const LoadingTimeline = () => {
         </div>
       </div>
 
-      {/* Decorative background elements */}
       <div className="absolute -inset-4 -z-10 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ 
