@@ -291,31 +291,7 @@ const LoadingTimeline = () => {
           </div>
         </div>
 
-        <div className="relative z-10 border-t border-slate-100 bg-slate-50/50 p-4">
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-2 h-2 rounded-full bg-green-500"
-                />
-                <span className="text-slate-600">3 agents active</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-slate-600">Avg response time:</span>
-                <span className="font-bold text-[#6264a7]">2.4s</span>
-              </div>
-            </div>
-            <motion.div
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="text-[#6264a7] font-medium"
-            >
-              Working in background
-            </motion.div>
-          </div>
-        </div>
+
       </div>
 
       {/* Decorative background elements */}
