@@ -317,18 +317,7 @@ const MessageBubble = ({ message, index }) => {
         </div>
       </div>
 
-      {!isUser && (
-        <div className="absolute left-1/4 -translate-x-1/2 -z-10">
-          <motion.div
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.1, 0.05, 0.1]
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className="w-32 h-32 rounded-full bg-gradient-to-r from-[#f3f4ff] to-transparent blur-xl"
-          />
-        </div>
-      )}
+
     </motion.div>
   );
 };
