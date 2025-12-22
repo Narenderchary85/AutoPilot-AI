@@ -28,7 +28,11 @@ const CenterPanel = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(API_URL, { message: userMsg.text });
+      const { data } = await axios.post(API_URL,{ message: userMsg.text }, { // Third argument: Config object (includes headers)
+        headers: { 
+          "Authorization": `Bearer ${localStorage.getItem('token')}` 
+        }
+      });
       const reply = data?.reply;
       const status = reply?.status;
       const details = reply?.details;
@@ -55,6 +59,7 @@ const CenterPanel = () => {
       setLoading(false);
     }
   };
+  
 
   const suggestions = [
     { text: "Read my unread emails from today", icon: FiMail },
