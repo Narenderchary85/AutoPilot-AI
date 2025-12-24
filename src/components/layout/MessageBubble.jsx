@@ -120,7 +120,7 @@ const MessageBubble = ({ message, index }) => {
       animate="visible"
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 group`}
     >
-      <div className={`flex max-w-2xl gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
+      <div className={` flex max-w-2xl gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -170,7 +170,7 @@ const MessageBubble = ({ message, index }) => {
 
           <motion.div
             variants={bubbleVariants}
-            className={`relative rounded-2xl shadow-sm overflow-hidden
+            className={`relative rounded-2xl shadow-sm overflow-hidden 
                         ${isUser 
                           ? 'bg-gradient-to-r from-slate-800 to-slate-900 text-white' 
                           : 'bg-gradient-to-br from-white to-slate-50 border border-slate-200'
