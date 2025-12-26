@@ -12,7 +12,31 @@ const CenterPanel = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFileName(file.name);
+      
+      // Optional: Show preview message
+      const fileMsg = { 
+        role: 'user', 
+        text: `📎 Uploaded file: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`,
+        isFile: true 
+      };
+      setMessages((prev) => [...prev, fileMsg]);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setFileName('');
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -20,46 +44,69 @@ const CenterPanel = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim() || loading) return;
-
-    const userMsg = { role: 'user', text: input.trim() };
+    if ((!input.trim() && !selectedFile) || loading) return;
+  
+    const formData = new FormData();
+    
+    // Add message if exists
+    if (input.trim()) {
+      formData.append('message', input.trim());
+    }
+    
+    // Add file if exists
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
+  
+    // Create user message for UI
+    const userMsg = { 
+      role: 'user', 
+      text: input.trim() || `📎 ${fileName}`,
+      isFile: !!selectedFile 
+    };
+    
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
+    setSelectedFile(null);
+    setFileName('');
     setLoading(true);
-
+  
     try {
-      const { data } = await axios.post(API_URL,{ message: userMsg.text }, { // Third argument: Config object (includes headers)
+      const { data } = await axios.post(API_URL, formData, {
         headers: { 
-          "Authorization": `Bearer ${localStorage.getItem('token')}` 
+          "Authorization": `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "multipart/form-data"
         }
       });
+      
       const reply = data?.reply;
       const status = reply?.status;
       const details = reply?.details;
-
+  
       const agentText = details?.message || JSON.stringify(reply, null, 2);
       const agentMsg = {
         role: 'agent',
         text: agentText,
         meta: { status, details },
       };
-
+  
       setTimeout(() => {
         setMessages((prev) => [...prev, agentMsg]);
         setLoading(false);
-      }, 800); 
+      }, 800);
+      
     } catch (err) {
+      console.error('API Error:', err);
       setMessages((prev) => [
         ...prev,
         {
           role: 'agent',
-          text: 'Something went wrong talking to AutoPilot backend.',
+          text: err.response?.data?.detail || 'Something went wrong talking to AutoPilot backend.',
         },
       ]);
       setLoading(false);
     }
   };
-  
 
   const suggestions = [
     { text: "Read my unread emails from today", icon: FiMail },
@@ -187,96 +234,143 @@ const CenterPanel = () => {
           )}
           <div ref={messagesEndRef} />
         </div>
-
         <motion.form
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pt-4"
+  onSubmit={handleSubmit}
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3 }}
+  className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pt-4"
+>
+  <motion.div
+    whileHover={{ scale: 1.005 }}
+    className="relative bg-white border border-slate-200 rounded-2xl
+              shadow-lg px-4 py-3"
+  >
+    {/* File name display (when file is selected) */}
+    {fileName && (
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: 'auto' }}
+        exit={{ opacity: 0, height: 0 }}
+        className="flex items-center justify-between mb-2 p-2 bg-blue-50 rounded-lg border border-blue-200"
+      >
+        <div className="flex items-center gap-2">
+          <FiPaperclip className="text-blue-500" size={14} />
+          <span className="text-xs font-medium text-blue-700 truncate max-w-[180px]">
+            {fileName}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={handleRemoveFile}
+          className="text-xs text-red-500 hover:text-red-700 p-1"
         >
-          <motion.div
-            whileHover={{ scale: 1.005 }}
-            className="relative bg-white border border-slate-200 rounded-2xl
-                      shadow-lg flex items-center gap-2 px-4 py-3"
-          >
+          Remove
+        </button>
+      </motion.div>
+    )}
 
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.9 }}
-              className="flex h-10 w-10 items-center justify-center rounded-xl
-                         text-slate-500 hover:text-[#6264a7] hover:bg-[#f3f4ff]
-                         border border-slate-200 hover:border-[#6264a7]/30"
-            >
-              <FiPaperclip size={18} />
-            </motion.button>
+    {/* Input area */}
+    <div className="flex items-center gap-2">
+      {/* File upload button */}
+      <div className="relative">
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileSelect}
+          className="hidden"
+          accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.csv,.xlsx,.pptx"
+        />
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => fileInputRef.current?.click()}
+          className={`flex h-10 w-10 items-center justify-center rounded-xl
+                     ${selectedFile 
+                       ? 'text-[#6264a7] bg-[#f3f4ff] border-[#6264a7]/50' 
+                       : 'text-slate-500 hover:text-[#6264a7] hover:bg-[#f3f4ff] border-slate-200 hover:border-[#6264a7]/30'
+                     } border`}
+        >
+          <FiPaperclip size={18} />
+        </motion.button>
+      </div>
 
-            <motion.div
-              className="flex-1"
-              whileFocus={{ scale: 1.01 }}
-            >
-              <textarea
-                rows={1}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask Autopilot to manage email, calendar, or web tasks…"
-                className="w-full resize-none border-none bg-transparent outline-none 
-                           text-sm placeholder:text-slate-400 focus:placeholder:text-slate-300
-                           min-h-[40px] max-h-[120px] py-2"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-              />
-            </motion.div>
-             <motion.button
-              type="submit"
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(98, 100, 167, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              className="relative overflow-hidden group flex items-center gap-2 px-5 py-2.5 
-                         rounded-xl text-sm font-semibold bg-gradient-to-r from-[#6264a7] to-[#505ac9] 
-                         text-white disabled:opacity-40 disabled:cursor-not-allowed"
-              disabled={!input.trim() || loading}
-            >
-              <motion.span
-                animate={loading ? { x: [-10, 10, -10] } : { x: 0 }}
-                transition={loading ? { repeat: Infinity, duration: 1 } : {}}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                style={{ translateX: '-100%' }}
-              />
-              <span className="relative z-10">
-                {loading ? 'Processing...' : 'Send'}
-              </span>
-              <motion.div
-                animate={loading ? { rotate: 360 } : {}}
-                transition={loading ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
-                className="relative z-10"
-              >
-                <FiSend size={16} />
-              </motion.div>
-            </motion.button>
-          </motion.div>
+      {/* Text input */}
+      <motion.div
+        className="flex-1"
+        whileFocus={{ scale: 1.01 }}
+      >
+        <textarea
+          rows={1}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={selectedFile ? "Add a message with your file..." : "Ask Autopilot to manage email, calendar, or web tasks…"}
+          className="w-full resize-none border-none bg-transparent outline-none 
+                     text-sm placeholder:text-slate-400 focus:placeholder:text-slate-300
+                     min-h-[40px] max-h-[120px] py-2"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
+        />
+      </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-center gap-2 mt-3"
-          >
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="w-2 h-2 rounded-full bg-green-500"
-            />
-            <p className="text-[11px] text-slate-400">
-              Autopilot is ready • Agents: <span className="text-[#6264a7] font-medium">Email</span>, 
-              <span className="text-[#6264a7] font-medium ml-1">Calendar</span>, 
-              <span className="text-[#6264a7] font-medium ml-1">Web</span>
-            </p>
-          </motion.div>
-        </motion.form>
+      {/* Send button */}
+      <motion.button
+        type="submit"
+        whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(98, 100, 167, 0.4)" }}
+        whileTap={{ scale: 0.95 }}
+        className="relative overflow-hidden group flex items-center gap-2 px-5 py-2.5 
+                   rounded-xl text-sm font-semibold bg-gradient-to-r from-[#6264a7] to-[#505ac9] 
+                   text-white disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled={(!input.trim() && !selectedFile) || loading}
+      >
+        <motion.span
+          animate={loading ? { x: [-10, 10, -10] } : { x: 0 }}
+          transition={loading ? { repeat: Infinity, duration: 1 } : {}}
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          style={{ translateX: '-100%' }}
+        />
+        <span className="relative z-10">
+          {loading ? 'Processing...' : 'Send'}
+        </span>
+        <motion.div
+          animate={loading ? { rotate: 360 } : {}}
+          transition={loading ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
+          className="relative z-10"
+        >
+          <FiSend size={16} />
+        </motion.div>
+      </motion.button>
+    </div>
+  </motion.div>
+
+      {/* Status indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center justify-center gap-2 mt-3"
+      >
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="w-2 h-2 rounded-full bg-green-500"
+        />
+        <p className="text-[11px] text-slate-400">
+          Autopilot is ready • Agents: <span className="text-[#6264a7] font-medium">Email</span>, 
+          <span className="text-[#6264a7] font-medium ml-1">Calendar</span>, 
+          <span className="text-[#6264a7] font-medium ml-1">Web</span>
+          {selectedFile && (
+            <span className="ml-2 text-blue-500 font-medium">
+              • File attached
+            </span>
+          )}
+        </p>
+      </motion.div>
+    </motion.form>
       </div>
 
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">

@@ -35,7 +35,7 @@ const getAgentIcon = (agentType) => {
       return FiMail;
     case 'calendar_management':
       return FiCalendar;
-    case 'web':
+    case 'web_search':
       return FiGlobe;
     default:
       return FiActivity;
