@@ -79,8 +79,7 @@ const Signup = () => {
       const response = await authService.signup(userData);
       
       setSuccess('Account created successfully! Please check your email to verify your account.');
-      
-      // Auto login after successful signup
+ 
       setTimeout(async () => {
         try {
           const loginResponse = await authService.login(formData.email, formData.password);
