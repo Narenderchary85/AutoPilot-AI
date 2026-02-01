@@ -60,10 +60,6 @@ const MainLayout = () => {
 
   return (
     <>
-    <VerifyConnection
-        isOpen={showVerifyModal}
-        onVerify={handleVerify}
-      />
     <div className="flex max-h-screen">
       <aside className="hidden md:flex w-80 border-r border-slate-200 bg-white/80 backdrop-blur-sm overflow-y-auto">
         <LeftSidebar />
