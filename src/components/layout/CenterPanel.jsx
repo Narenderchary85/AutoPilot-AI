@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSend, FiPaperclip, FiZap, FiMail, FiCalendar, FiGlobe } from 'react-icons/fi';
-
+import { MdMovieFilter } from "react-icons/md";
 import LoadingTimeline from '../chat/LoadingTimeline';
 import MessageBubble from './MessageBubble';
+import ActivityReplay from '../ActivityReplay';
 
 const API_URL = 'http://localhost:8000/chat';
 
@@ -16,6 +17,7 @@ const CenterPanel = () => {
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const [showReplay, setShowReplay] = useState(false);
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -118,6 +120,16 @@ const CenterPanel = () => {
   return (
     <div className="flex-1 flex flex-col items-center bg-gradient-to-b from-slate-50 to-white">
       <div className="w-full max-w-3xl flex-1 flex flex-col px-4 py-6 gap-4">
+      <ActivityReplay
+        isOpen={showReplay}
+        onClose={() => setShowReplay(false)}
+      />
+      <button
+        onClick={() => setShowReplay(true)}
+        className="bg-[#6264a7] text-white p-3 rounded-full fixed top-6 left-80 shadow-lg hover:bg-[#505ac9] transition-colors"
+      >
+        <MdMovieFilter/>
+      </button>
         <AnimatePresence>
           {messages.length === 0 && !loading && (
             <motion.div

@@ -1,334 +1,185 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiCpu, FiUser, FiCheckCircle, FiAlertCircle, FiClock, FiCopy, FiChevronDown, FiExternalLink } from 'react-icons/fi';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiCpu,
+  FiUser,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiClock,
+  FiCopy,
+  FiChevronDown,
+} from "react-icons/fi";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 
 const MessageBubble = ({ message, index }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
-  const isUser = message.role === 'user';
+
+  const isUser = message.role === "user";
 
   const containerVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       x: isUser ? 50 : -50,
-      scale: 0.9 
+      scale: 0.9,
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       x: 0,
       scale: 1,
       transition: {
         type: "spring",
         stiffness: 200,
         damping: 20,
-        delay: index * 0.05
-      }
-    }
+        delay: index * 0.05,
+      },
+    },
   };
 
   const bubbleVariants = {
     hidden: { scale: 0.8, opacity: 0 },
-    visible: { 
-      scale: 1, 
+    visible: {
+      scale: 1,
       opacity: 1,
-      transition: { type: "spring", stiffness: 200, damping: 15 }
-    }
+      transition: { type: "spring", stiffness: 200, damping: 15 },
+    },
   };
-  console.log(message)
+
+  // ✅ Extract readable content (simplified)
+  const extractContent = () => {
+    if (typeof message === "string") return message;
+    if (message?.text) return message.text;
+    if (message?.content) return message.content;
+    return "";
+  };
+
+  const content = extractContent();
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(message.text);
+      await navigator.clipboard.writeText(content);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text:', err);
+      console.error("Copy failed:", err);
     }
   };
-
-  const getStatusIcon = (status) => {
-    switch(status?.toLowerCase()) {
-      case 'completed':
-      case 'success':
-        return <FiCheckCircle className="text-green-500" size={14} />;
-      case 'failed':
-      case 'error':
-        return <FiAlertCircle className="text-red-500" size={14} />;
-      case 'processing':
-      case 'pending':
-        return <FiClock className="text-yellow-500" size={14} />;
-      default:
-        return null;
-    }
-  };
-
-  const formatTimestamp = () => {
-    const now = new Date();
-    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const getAgentType = () => {
-    if (!message.meta?.details?.agent) return 'AutoPilot AI';
-    
-    const agent = message.meta.details.agent;
-    return agent.charAt(0).toUpperCase() + agent.slice(1) + ' Agent';
-  };
-
-  function extractReadableText(response) {
-    console.log("RAW RESPONSE:", response);
-  
-    let text = "";
-
-    if (typeof response === "string") {
-      text = response;
-    }
-
-    else if (typeof response === "object" && response !== null) {
-      if (typeof response.message === "string") {
-        text = response.message;
-      } else if (typeof response.emails === "string") {
-        text = response.emails;
-      } else if (typeof response.text === "string") {
-        text = response.text;
-      } else {
-        text = JSON.stringify(response);
-      }
-    }
-  
-    return cleanReadableText(text);
-  }
-
-  function cleanReadableText(text) {
-    if (!text) return "";
-  
-    return text
-      .replace(/^{|}$/g, "")
-      .replace(/^"+|"+$/g, "")
-      .replace(/\\n/g, "\n")
-      .replace(/\\"/g, '"')
-      .replace(/"\s*:\s*"/g, " ")
-      .replace(/\s{2,}/g, " ")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-  }
-  
 
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 group`}
+      className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3 group`}
     >
-      <div className={` flex max-w-2xl gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
+      <div
+        className={`flex max-w-3xl gap-3 ${
+          isUser ? "flex-row-reverse" : ""
+        }`}
+      >
+        {/* Avatar */}
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className={`relative mt-1 h-8 w-8 rounded-full flex items-center justify-center
-                      shadow-sm ${isUser ? 'bg-gradient-to-br from-slate-800 to-slate-900' 
-                        : 'bg-gradient-to-br from-[#6264a7] to-[#505ac9]'}`}
+          className={`relative mt-1 h-8 w-8 rounded-full flex items-center justify-center shadow-sm ${
+            isUser
+              ? "bg-gradient-to-br from-slate-800 to-slate-900"
+              : "bg-gradient-to-br from-[#6264a7] to-[#505ac9]"
+          }`}
         >
           {isUser ? (
             <FiUser className="text-white text-sm" />
           ) : (
-            <motion.div
-              animate={{ rotate: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <FiCpu className="text-white text-sm" />
-            </motion.div>
-          )}
-
-          {!isUser && (
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-white"
-            />
+            <FiCpu className="text-white text-sm" />
           )}
         </motion.div>
 
-        <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-[85%]`}>
-
-          {!isUser && (
-            <motion.div
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-2 mb-1 ml-1"
-            >
-              <span className="text-xs font-semibold text-[#6264a7]">
-                {getAgentType()}
-              </span>
-              {message.meta?.status && (
-                <div className="flex items-center gap-1 text-xs text-slate-500">
-                  {getStatusIcon(message.meta.status)}
-                  <span className="font-medium">{message.meta.status}</span>
-                </div>
-              )}
-            </motion.div>
-          )}
-
+        {/* Bubble */}
+        <div
+          className={`flex flex-col ${
+            isUser ? "items-end" : "items-start"
+          } max-w-[90%]`}
+        >
           <motion.div
             variants={bubbleVariants}
-            className={`relative rounded-2xl shadow-sm overflow-hidden 
-                        ${isUser 
-                          ? 'bg-gradient-to-r from-slate-800 to-slate-900 text-white' 
-                          : 'bg-gradient-to-br from-white to-slate-50 border border-slate-200'
-                        }`}
+            className={`relative rounded-2xl shadow-sm overflow-hidden ${
+              isUser
+                ? "bg-gradient-to-r from-slate-800 to-slate-900 text-white"
+                : "bg-white border border-slate-200"
+            }`}
           >
-            {!isUser && (
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                initial={{ x: '-100%' }}
-                animate={{ x: '100%' }}
-                transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
-              />
-            )}
-
             <div className="relative z-10 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="text-sm leading-relaxed whitespace-pre-line">
-                <p className="text-sm leading-relaxed whitespace-pre-line">
-                {extractReadableText(message)}
-                </p>
+              <div className="flex justify-between gap-3">
+                {/* ✅ Markdown Rendering */}
+                <div
+                  className={`prose prose-sm max-w-none ${
+                    isUser ? "prose-invert" : ""
+                  }`}
+                >
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                    components={{
+                      code({ inline, className, children, ...props }) {
+                        return !inline ? (
+                          <pre className="rounded-lg p-3 overflow-x-auto bg-slate-900 text-sm">
+                            <code className={className} {...props}>
+                              {children}
+                            </code>
+                          </pre>
+                        ) : (
+                          <code className="bg-slate-200 px-1 py-0.5 rounded text-sm">
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  >
+                    {content}
+                  </ReactMarkdown>
                 </div>
-                
-                <div className={`flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                                ${isUser ? 'flex-row' : 'flex-row-reverse'}`}>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+
+                {/* Copy Button */}
+                <div className="opacity-0 group-hover:opacity-100 transition">
+                  <button
                     onClick={copyToClipboard}
                     className={`p-1.5 rounded-lg ${
-                      isUser 
-                        ? 'bg-white/10 hover:bg-white/20' 
-                        : 'bg-slate-100 hover:bg-slate-200'
+                      isUser
+                        ? "bg-white/10 hover:bg-white/20"
+                        : "bg-slate-100 hover:bg-slate-200"
                     }`}
                   >
-                    <FiCopy size={12} className={copied ? 'text-green-500' : 'text-slate-500'} />
-                  </motion.button>
+                    <FiCopy
+                      size={12}
+                      className={copied ? "text-green-500" : "text-slate-500"}
+                    />
+                  </button>
                 </div>
               </div>
-
-              {message.meta?.details && (
-                <>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className={`flex items-center gap-1 mt-3 text-xs font-medium px-2 py-1 rounded-lg
-                              ${isUser 
-                                ? 'bg-white/10 text-white/80 hover:bg-white/20' 
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                              }`}
-                  >
-                    <span>Details</span>
-                    <motion.div
-                      animate={{ rotate: isExpanded ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <FiChevronDown size={12} />
-                    </motion.div>
-                  </motion.button>
-
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <div className={`mt-3 p-3 rounded-lg border text-xs ${
-                          isUser ? 'border-white/20' : 'border-slate-200'
-                        }`}>
-                          <div className="grid grid-cols-2 gap-2">
-                            {message.meta.status && (
-                              <div>
-                                <div className="text-slate-500 mb-1">Status</div>
-                                <div className="font-medium flex items-center gap-1">
-                                  {getStatusIcon(message.meta.status)}
-                                  {message.meta.status}
-                                </div>
-                              </div>
-                            )}
-                            {message.meta.details.agent && (
-                              <div>
-                                <div className="text-slate-500 mb-1">Agent</div>
-                                <div className="font-medium text-[#6264a7]">
-                                  {message.meta.details.agent}
-                                </div>
-                              </div>
-                            )}
-                            {message.meta.details.timestamp && (
-                              <div>
-                                <div className="text-slate-500 mb-1">Timestamp</div>
-                                <div className="font-medium">
-                                  {new Date(message.meta.details.timestamp).toLocaleTimeString()}
-                                </div>
-                              </div>
-                            )}
-                            {message.meta.details.duration && (
-                              <div>
-                                <div className="text-slate-500 mb-1">Duration</div>
-                                <div className="font-medium">
-                                  {message.meta.details.duration}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {message.meta.details.additionalInfo && (
-                            <div className="mt-2 pt-2 border-t border-slate-200">
-                              <div className="text-slate-500 mb-1">Additional Info</div>
-                              <pre className="text-xs overflow-x-auto p-2 bg-slate-50 rounded">
-                                {JSON.stringify(message.meta.details.additionalInfo, null, 2)}
-                              </pre>
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </>
-              )}
             </div>
           </motion.div>
+
+          {/* Timestamp */}
           <div className="flex items-center gap-3 mt-1 ml-1">
             <span className="text-[10px] text-slate-400 font-medium">
-              {formatTimestamp()}
+              {new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </span>
-            
-            <AnimatePresence>
-              {copied && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex items-center gap-1 text-[10px] text-green-600"
-                >
-                  <FiCheckCircle size={10} />
-                  <span>Copied!</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
+
+            {copied && (
+              <div className="flex items-center gap-1 text-[10px] text-green-600">
+                <FiCheckCircle size={10} />
+                <span>Copied!</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {!isUser && (
-        <div className="absolute left-1/4 -translate-x-1/2 -z-10">
-          <motion.div
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.1, 0.05, 0.1]
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className="w-32 h-32 rounded-full bg-gradient-to-r from-[#f3f4ff] to-transparent blur-xl"
-          />
-        </div>
-      )}
     </motion.div>
   );
 };
